@@ -8,7 +8,7 @@ export default function App() {
         <Button title="Add name" />
       </View>
       <View>
-        <Text>Names</Text>
+        <Text>Names: </Text>
       </View>
     </View>
   );

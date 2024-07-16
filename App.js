@@ -1,24 +1,79 @@
-import {Button, StyleSheet, Text, TextInput, View} from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, View, FlatList, Button } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import NameInput from "./components/NameInput";
+import NameItem from "./components/NameItem";
 
 export default function App() {
+  const [modalIsVisible, setModalIsVisible] = useState(false);
+  const [courseNames, setCourseNames] = useState([]);
+
+  function startAddNameHandler() {
+    setModalIsVisible(true);
+  }
+
+  function endAddNameHandler() {
+    setModalIsVisible(false);
+  }
+
+  function addNameHandler(enteredNameText) {
+    setCourseNames((currentCourseNames) => [
+      ...currentCourseNames,
+      { text: enteredNameText, id: Math.random().toString() },
+    ]);
+    endAddNameHandler();
+  }
+
+  function deleteNameHandler(id) {
+    setCourseNames((currentCourseNames) => {
+      return currentCourseNames.filter((name) => name.id !== id);
+    });
+  }
+
   return (
-    <View style={styles.appContainer}>
-      <View style={styles.inputContainer}>
-        <TextInput placeholder="Enter a name" />
-        <Button title="Add name" />
+    <>
+      <StatusBar style="light" />
+      <View style={styles.appContainer}>
+        <Button
+          title="Add New Name"
+          color="#a065ec"
+          onPress={startAddNameHandler}
+        />
+        <NameInput
+          visible={modalIsVisible}
+          onAddName={addNameHandler}
+          onCancel={endAddNameHandler}
+        />
+        <View style={styles.namesContainer}>
+          <FlatList
+            data={courseNames}
+            renderItem={(itemData) => {
+              return (
+                <NameItem
+                  text={itemData.item.text}
+                  id={itemData.item.id}
+                  onDeleteItem={deleteNameHandler}
+                />
+              );
+            }}
+            keyExtractor={(item, index) => {
+              return item.id;
+            }}
+            alwaysBounceVertical={false}
+          />
+        </View>
       </View>
-      <View>
-        <Text>Names: </Text>
-      </View>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   appContainer: {
-    padding: 50,
+    flex: 1,
+    paddingTop: 50,
+    paddingHorizontal: 16,
   },
-    inputContainer: {
-    flexDirection: 'row',
-    }
+  namesContainer: {
+    flex: 5,
+  },
 });
